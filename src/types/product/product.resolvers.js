@@ -21,7 +21,7 @@ export default {
   },
   Mutation: {
     async newProduct(parent, args, ctx, info){
-      const product = await Product.create({...args.input, createdBy: ctx.user});
+      const product = await Product.create({...args.input, createdBy: ctx.user._id});
       return product;
     },
     updateProduct(parent, {id, input}, ctx, info){
