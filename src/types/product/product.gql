@@ -12,7 +12,7 @@ enum BikeType {
 }
 
 type Product {
-
+  id: ID!
   name: String!
   price: Float!
   image: String!
