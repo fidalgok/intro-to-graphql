@@ -10,32 +10,36 @@ const productsTypeMatcher = {
 }
 
 /** product */
-const product = (_, args, ctx) => {
+const product = (_, args, {user}) => {
+  if(!user) throw new AuthenticationError();
   return Product.findById(args.id)
     .lean()
     .exec()
 }
 
-const newProduct = (_, args, ctx) => {
-  // use this fake ID for createdBy for now until we talk auth
-  const createdBy = mongoose.Types.ObjectId()
-  return Product.create({ ...args.input, createdBy })
+const newProduct = (_, args, {user}) => {
+
+  if(!user || user.role !== roles.admin) throw new AuthenticationError();
+  return Product.create({ ...args.input, createdBy: user._id });
 }
 
-const products = (_, args, ctx) => {
+const products = (_, args, {user}) => {
+  if(!user) throw new AuthenticationError();
   return Product.find({})
     .lean()
     .exec()
 }
 
-const updateProduct = (_, args, ctx) => {
+const updateProduct = (_, args, {user}) => {
+  if(!user || user.role !== roles.admin) throw new AuthenticationError();
   const update = args.input
   return Product.findByIdAndUpdate(args.id, update, { new: true })
     .lean()
     .exec()
 }
 
-const removeProduct = (_, args, ctx) => {
+const removeProduct = (_, args, {user}) => {
+  if(!user || user.role !== roles.admin) throw new AuthenticationError();
   return Product.findByIdAndRemove(args.id)
     .lean()
     .exec()

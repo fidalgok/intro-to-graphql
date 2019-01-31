@@ -3,6 +3,7 @@ import { loadTypeSchema } from './utils/schema'
 import { merge } from 'lodash'
 import config from './config'
 import { connect } from './db'
+import { authenticate } from './utils/auth';
 import product from './types/product/product.resolvers'
 import coupon from './types/coupon/coupon.resolvers'
 import user from './types/user/user.resolvers'
@@ -21,8 +22,10 @@ export const start = async () => {
   const server = new ApolloServer({
     typeDefs: [rootSchema, ...schemaTypes],
     resolvers: merge({}, product, coupon, user),
-    context({ req }) {
+    async context({ req }) {
       // use the authenticate function from utils to auth req, its Async!
+      const user = await authenticate(req);
+      if(user) return {user};
       return { user: null }
     }
   })
